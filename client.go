@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	astihttp "github.com/asticode/go-astitools/http"
+	"github.com/asticode/go-astikit"
 	"github.com/pkg/errors"
 )
 
@@ -16,14 +16,14 @@ const baseURL = "https://api2.branch.io"
 // Client represents the client
 type Client struct {
 	c Configuration
-	s *astihttp.Sender
+	s *astikit.HTTPSender
 }
 
 // New creates a new client
 func New(c Configuration) *Client {
 	return &Client{
 		c: c,
-		s: astihttp.NewSender(c.Sender),
+		s: astikit.NewHTTPSender(c.Sender),
 	}
 }
 
