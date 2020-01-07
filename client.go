@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/asticode/go-astikit"
-	"github.com/pkg/errors"
 )
 
 const baseURL = "https://api2.branch.io"
@@ -44,7 +43,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 		// Marshal
 		buf := &bytes.Buffer{}
 		if err = json.NewEncoder(buf).Encode(reqPayload); err != nil {
-			err = errors.Wrapf(err, "astibranch: marshaling payload of %s request to %s failed", method, url)
+			err = fmt.Errorf("astibranch: marshaling payload of %s request to %s failed: %w", method, url, err)
 			return
 		}
 
@@ -55,14 +54,14 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 	// Create request
 	var req *http.Request
 	if req, err = http.NewRequest(method, baseURL+url, body); err != nil {
-		err = errors.Wrapf(err, "astibranch: creating %s request to %s failed", method, url)
+		err = fmt.Errorf("astibranch: creating %s request to %s failed: %w", method, url, err)
 		return
 	}
 
 	// Send
 	var resp *http.Response
 	if resp, err = c.s.Send(req); err != nil {
-		err = errors.Wrapf(err, "astibranch: sending %s request to %s failed", req.Method, req.URL.Path)
+		err = fmt.Errorf("astibranch: sending %s request to %s failed: %w", req.Method, req.URL.Path, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -72,7 +71,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 		// Unmarshal
 		var e ErrorPayload
 		if err = json.NewDecoder(resp.Body).Decode(&e); err != nil {
-			err = errors.Wrap(err, "astibranch: unmarshaling error failed")
+			err = fmt.Errorf("astibranch: unmarshaling error failed: %w", err)
 			return
 		}
 
@@ -85,7 +84,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 	if respPayload != nil {
 		// Unmarshal
 		if err = json.NewDecoder(resp.Body).Decode(&respPayload); err != nil {
-			err = errors.Wrap(err, "astibranch: unmarshaling response failed")
+			err = fmt.Errorf("astibranch: unmarshaling response failed: %w", err)
 			return
 		}
 	}

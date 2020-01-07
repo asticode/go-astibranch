@@ -1,11 +1,10 @@
 package astibranch
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
-
-	"encoding/json"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -68,7 +67,7 @@ func (c *Client) CreateLink(d *LinkData) (l Link, err error) {
 		BranchKey: c.c.Key,
 		Data:      d,
 	}, &l); err != nil {
-		err = errors.Wrap(err, "astibranch: sending failed")
+		err = fmt.Errorf("astibranch: sending failed: %w", err)
 		return
 	}
 	return
